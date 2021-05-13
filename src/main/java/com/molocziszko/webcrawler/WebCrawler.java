@@ -1,7 +1,9 @@
 package com.molocziszko.webcrawler;
 
+import com.molocziszko.webcrawler.utils.CSVWriter;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
 
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -25,6 +27,42 @@ public class WebCrawler {
         keywordList = termsToSearch;
     }
 
+    public static void main(String[] args) {
+        String terms = "Tesla, Musk, Gigafactory, Elon Mask";
+        new WebCrawler(new CrawlURL("https://en.wikipedia.org/wiki/Elon_Musk", 0), terms).crawl();
+    }
+
+    public void crawl() {
+        int crawledPages = 0;
+        while (!listOfPagesToCrawl.isEmpty() && listOfVisitedPages.size() <= MAX_VISITED_PAGES) {
+            CrawlURL currentLink = listOfPagesToCrawl.remove();
+            var url = currentLink.getUrl();
+            var depth = currentLink.getDepth();
+            HitsHunter hitsHunter = new HitsHunter(currentLink.getUrl(), keywordList);
+
+            var doc = getPage(depth, url, listOfVisitedPages);
+            var shots = hitsHunter.search(doc);
+            var nextDepth = depth + 1;
+
+            printer.printTotalResult(hitsHunter);
+            CSVWriter.serialize(shots);
+
+            if (doc != null && depth <= MAX_DEPTH) {
+                for (Element link : doc.select("a[href]")) {
+                    String next_link = link.absUrl("href");
+                    if (!listOfVisitedPages.contains(next_link)) {
+                        listOfPagesToCrawl.add(new CrawlURL(next_link, nextDepth));
+                        crawledPages++;
+                    }
+                }
+            }
+        }
+        System.out.println("Finished!");
+    }
+
+    /**
+     * @return A Document containing the html page required to parse later.
+     */
     private Document getPage(int depth, String url, Deque<String> listOfPages) {
 
         try {
