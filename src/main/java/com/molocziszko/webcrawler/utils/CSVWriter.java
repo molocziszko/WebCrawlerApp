@@ -10,7 +10,7 @@ import java.util.List;
 public class CSVWriter {
 
     /**
-     * Yhis method serve for write resulting data in file.
+     * This method serve for write resulting data in file.
      */
     public static void writeIn(List<String> result) {
         String file = "src/main/resources/stat_report.csv";
@@ -23,7 +23,6 @@ public class CSVWriter {
                         StandardOpenOption.CREATE,
                         StandardOpenOption.APPEND);
             }
-
         } catch (IOException e) {
             e.printStackTrace();
         }

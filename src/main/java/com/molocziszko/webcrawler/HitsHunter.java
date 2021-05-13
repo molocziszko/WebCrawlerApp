@@ -1,18 +1,16 @@
 package com.molocziszko.webcrawler;
 
-import com.molocziszko.webcrawler.utils.CSVWriter;
 import com.molocziszko.webcrawler.utils.Extractor;
-import com.molocziszko.webcrawler.utils.Printer;
 import org.jsoup.nodes.Document;
 
-import java.util.*;
-import java.util.stream.Stream;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class HitsHunter {
     private static String keywordList;
     private final Map<String, Integer> hitsList;
     private String seedUrl;
-    private int totalHitsOnLink;
 
     public HitsHunter(String url, String keywordList) {
         hitsList = new LinkedHashMap<>();
@@ -30,12 +28,10 @@ public class HitsHunter {
 
     public void search(Document doc) {
         var matcherTextList = Extractor.extract(doc);
-        var keys = Arrays.asList(getKeywordList());
+        var keys = Collections.singletonList(getKeywordList());
         initHitsPairs(seedUrl);
 
         for (String word : matcherTextList) {
-            /*var occurrences = Collections.frequency(keys, word);
-            collectAllHits(word, occurrences);*/
             if (getHitsList().containsKey(word)) {
                 collectAllHits(word);
             }
@@ -44,7 +40,6 @@ public class HitsHunter {
 
     public void collectAllHits(String word) {
         getHitsList().put(word, getHitsList().get(word) + 1);
-        totalHitsOnLink += 1;
     }
 
     public Map<String, Integer> getHitsList() {
@@ -57,10 +52,6 @@ public class HitsHunter {
 
     public String getSeedUrl() {
         return seedUrl;
-    }
-
-    public int getTotalHitsOnLink() {
-        return totalHitsOnLink;
     }
 
     public String getCollection() {

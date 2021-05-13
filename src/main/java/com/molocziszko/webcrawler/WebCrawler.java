@@ -7,10 +7,7 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Deque;
-import java.util.List;
+import java.util.*;
 
 public class WebCrawler {
     private static final int MAX_DEPTH = 8;
@@ -19,6 +16,7 @@ public class WebCrawler {
     private final Deque<CrawlURL> listOfPagesToCrawl;
     private final Deque<String> listOfVisitedPages;
     private final String keywordList;
+    private Map<String, Integer> topTenPages;
 
     public WebCrawler(CrawlURL seedURL, String termsToSearch) {
         this.listOfPagesToCrawl = new ArrayDeque<>(10_000);
@@ -34,7 +32,7 @@ public class WebCrawler {
 
     public void crawl() {
         int crawledPages = 0;
-        List<String> buffer = new ArrayList<>(50);
+        List<String> buffer = new ArrayList<>(100);
         while (!listOfPagesToCrawl.isEmpty() && listOfVisitedPages.size() <= MAX_VISITED_PAGES) {
             CrawlURL currentLink = listOfPagesToCrawl.remove();
             var url = currentLink.getUrl();
@@ -50,7 +48,7 @@ public class WebCrawler {
             buffer.add(result);
             if (buffer.size() == 50) {
                 CSVWriter.writeIn(buffer);
-                buffer = new ArrayList<>(50);
+                buffer = new ArrayList<>(100);
             }
 
             if (doc != null && depth <= MAX_DEPTH) {
