@@ -17,6 +17,6 @@ public class Printer {
     public static String printTotalResult(HitsHunter map) {
 
         return map.getSeedUrl()
-                + " " + map.getCollection();
+                + "; " + map.getCollection();
     }
 }

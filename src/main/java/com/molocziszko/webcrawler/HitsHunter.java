@@ -28,18 +28,13 @@ public class HitsHunter {
 
     public void search(Document doc) {
         var matcherTextList = Extractor.extract(doc);
-        var keys = Collections.singletonList(getKeywordList());
+        var keys = Extractor.toArr(getKeywordList());
         initHitsPairs(seedUrl);
 
-        for (String word : matcherTextList) {
-            if (getHitsList().containsKey(word)) {
-                collectAllHits(word);
-            }
+        for (String key : keys) {
+            int count = Collections.frequency(matcherTextList, key);
+            hitsList.put(key, count);
         }
-    }
-
-    public void collectAllHits(String word) {
-        getHitsList().put(word, getHitsList().get(word) + 1);
     }
 
     public Map<String, Integer> getHitsList() {
@@ -59,7 +54,7 @@ public class HitsHunter {
         StringBuilder sb = new StringBuilder();
         for (int val : collection.values()) {
             sb.append(val);
-            sb.append(" ");
+            sb.append("; ");
         }
         return sb.toString();
     }

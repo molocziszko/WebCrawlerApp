@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class WebCrawler {
     private static final int MAX_DEPTH = 8;
@@ -19,8 +20,9 @@ public class WebCrawler {
     private Map<String, Integer> topTenPages;
 
     public WebCrawler(CrawlURL seedURL, String termsToSearch) {
-        this.listOfPagesToCrawl = new ArrayDeque<>(10_000);
-        this.listOfVisitedPages = new ArrayDeque<>(10_000);
+        listOfPagesToCrawl = new ArrayDeque<>(10_000);
+        listOfVisitedPages = new ArrayDeque<>(10_000);
+        topTenPages = new HashMap<>(10_000);
         listOfPagesToCrawl.add(seedURL);
         keywordList = termsToSearch;
     }
@@ -41,17 +43,18 @@ public class WebCrawler {
 
             var doc = getPage(depth, url, listOfVisitedPages);
             hitsHunter.search(doc);
-            var nextDepth = depth + 1;
+            topTenPages.putAll(hitsHunter.getHitsList());
 
             Printer.printProcess(url, depth, listOfVisitedPages);
             var result = Printer.printTotalResult(hitsHunter);
             buffer.add(result);
-            if (buffer.size() == 50) {
+            if (buffer.size() == 100) {
                 CSVWriter.writeIn(buffer);
                 buffer = new ArrayList<>(100);
             }
 
             if (doc != null && depth <= MAX_DEPTH) {
+                var nextDepth = depth + 1;
                 for (Element link : doc.select("a[href]")) {
                     String next_link = link.absUrl("href");
                     if (!listOfVisitedPages.contains(next_link)) {
@@ -61,6 +64,12 @@ public class WebCrawler {
                 }
             }
         }
+        var sorted = topTenPages
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
+                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
+                        (e1, e2) -> e1, LinkedHashMap::new));
         System.out.println("Finished!");
     }
 
@@ -72,7 +81,7 @@ public class WebCrawler {
             Document doc = connection.get();
 
             if (connection.response().statusCode() == 200) {
-                if (!listOfPages.contains(url)) {
+                if (Collections.frequency(listOfPages, url) == 0) {
                     listOfPages.add(url);
                 }
                 return doc;
