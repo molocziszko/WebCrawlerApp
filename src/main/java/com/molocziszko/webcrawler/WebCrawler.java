@@ -1,16 +1,16 @@
 package com.molocziszko.webcrawler;
 
 import com.molocziszko.webcrawler.utils.CSVWriter;
+import com.molocziszko.webcrawler.utils.Printer;
+import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 
 public class WebCrawler {
     private static final int MAX_DEPTH = 8;
@@ -34,6 +34,7 @@ public class WebCrawler {
 
     public void crawl() {
         int crawledPages = 0;
+        List<String> buffer = new ArrayList<>(50);
         while (!listOfPagesToCrawl.isEmpty() && listOfVisitedPages.size() <= MAX_VISITED_PAGES) {
             CrawlURL currentLink = listOfPagesToCrawl.remove();
             var url = currentLink.getUrl();
@@ -41,11 +42,16 @@ public class WebCrawler {
             HitsHunter hitsHunter = new HitsHunter(currentLink.getUrl(), keywordList);
 
             var doc = getPage(depth, url, listOfVisitedPages);
-            var shots = hitsHunter.search(doc);
+            hitsHunter.search(doc);
             var nextDepth = depth + 1;
 
-            printer.printTotalResult(hitsHunter);
-            CSVWriter.serialize(shots);
+            Printer.printProcess(url, depth, listOfVisitedPages);
+            var result = Printer.printTotalResult(hitsHunter);
+            buffer.add(result);
+            if (buffer.size() == 50) {
+                CSVWriter.writeIn(buffer);
+                buffer = new ArrayList<>(50);
+            }
 
             if (doc != null && depth <= MAX_DEPTH) {
                 for (Element link : doc.select("a[href]")) {
@@ -60,24 +66,14 @@ public class WebCrawler {
         System.out.println("Finished!");
     }
 
-    /**
-     * @return A Document containing the html page required to parse later.
-     */
+
     private Document getPage(int depth, String url, Deque<String> listOfPages) {
 
         try {
-            HttpClient client = HttpClient.newHttpClient();
-            HttpRequest request = HttpRequest.newBuilder()
-                    .uri(URI.create(url))
-                    .build();
+            Connection connection = Jsoup.connect(url);
+            Document doc = connection.get();
 
-            HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-            var statusCode = response.statusCode();
-            var textToParse = response.body();
-
-            Document doc = Jsoup.parse(textToParse);
-
-            if (statusCode == 200) {
+            if (connection.response().statusCode() == 200) {
                 if (!listOfPages.contains(url)) {
                     listOfPages.add(url);
                 }

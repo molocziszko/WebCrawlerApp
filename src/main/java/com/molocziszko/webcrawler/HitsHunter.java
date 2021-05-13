@@ -1,40 +1,46 @@
 package com.molocziszko.webcrawler;
 
+import com.molocziszko.webcrawler.utils.CSVWriter;
 import com.molocziszko.webcrawler.utils.Extractor;
+import com.molocziszko.webcrawler.utils.Printer;
 import org.jsoup.nodes.Document;
 
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 public class HitsHunter {
-    private int totalHitsOnLink;
-    private Map<String, Integer> hitsList;
-    private String seedUrl;
     private static String keywordList;
+    private final Map<String, Integer> hitsList;
+    private String seedUrl;
+    private int totalHitsOnLink;
 
     public HitsHunter(String url, String keywordList) {
-
+        hitsList = new LinkedHashMap<>();
+        HitsHunter.keywordList = keywordList;
+        initHitsPairs(url);
     }
 
-    protected void initHitsPairs(String keys) {
-        var keywordsList = Extractor.toArr(keys);
+    private void initHitsPairs(String url) {
+        this.seedUrl = url;
+        var keywordsList = Extractor.toArr(keywordList);
         for (String key : keywordsList) {
             hitsList.put(key, 0);
         }
     }
 
-    /*public String search(Document doc) {
-        String[] matcherTextList = Extractor.extract(doc).toLowerCase().split(" ");
-
-        initHitsPairs(keywordList);
+    public void search(Document doc) {
+        var matcherTextList = Extractor.extract(doc);
+        var keys = Arrays.asList(getKeywordList());
+        initHitsPairs(seedUrl);
 
         for (String word : matcherTextList) {
+            /*var occurrences = Collections.frequency(keys, word);
+            collectAllHits(word, occurrences);*/
             if (getHitsList().containsKey(word)) {
                 collectAllHits(word);
             }
         }
-
-        // return progressViewer.printTotalResult(this);
-    }*/
+    }
 
     public void collectAllHits(String word) {
         getHitsList().put(word, getHitsList().get(word) + 1);
@@ -59,7 +65,11 @@ public class HitsHunter {
 
     public String getCollection() {
         var collection = getHitsList();
-        collection.put("Total", getTotalHitsOnLink());
-        return Extractor.toStr(collection);
+        StringBuilder sb = new StringBuilder();
+        for (int val : collection.values()) {
+            sb.append(val);
+            sb.append(" ");
+        }
+        return sb.toString();
     }
 }
