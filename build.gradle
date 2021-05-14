@@ -2,6 +2,13 @@ plugins {
     id 'java'
 }
 
+apply plugin: 'java'
+sourceCompatibility = 15
+targetCompatibility = 15
+
+apply plugin:'application'
+mainClassName = "com.molocziszko.webcrawler.WebCrawler"
+
 group 'com.molocziszko'
 version '1.0-SNAPSHOT'
 
