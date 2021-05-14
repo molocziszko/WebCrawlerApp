@@ -7,10 +7,11 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class HitsHunter {
+public class HitsHunter implements Comparable<HitsHunter> {
     private static String keywordList;
     private final Map<String, Integer> hitsList;
     private String seedUrl;
+    private int hitsSum;
 
     public HitsHunter(String url, String keywordList) {
         hitsList = new LinkedHashMap<>();
@@ -34,6 +35,7 @@ public class HitsHunter {
         for (String key : keys) {
             int count = Collections.frequency(matcherTextList, key);
             hitsList.put(key, count);
+            hitsSum += count;
         }
     }
 
@@ -49,6 +51,10 @@ public class HitsHunter {
         return seedUrl;
     }
 
+    public int getHitsSum() {
+        return hitsSum;
+    }
+
     public String getCollection() {
         var collection = getHitsList();
         StringBuilder sb = new StringBuilder();
@@ -57,5 +63,10 @@ public class HitsHunter {
             sb.append("; ");
         }
         return sb.toString();
+    }
+
+    @Override
+    public int compareTo(HitsHunter o) {
+        return o.hitsSum - this.hitsSum;
     }
 }

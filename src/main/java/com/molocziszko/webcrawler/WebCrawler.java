@@ -17,12 +17,12 @@ public class WebCrawler {
     private final Deque<CrawlURL> listOfPagesToCrawl;
     private final Deque<String> listOfVisitedPages;
     private final String keywordList;
-    private Map<String, Integer> topTenPages;
+    private final Deque<HitsHunter> topTenPages;
 
     public WebCrawler(CrawlURL seedURL, String termsToSearch) {
         listOfPagesToCrawl = new ArrayDeque<>(10_000);
         listOfVisitedPages = new ArrayDeque<>(10_000);
-        topTenPages = new HashMap<>(10_000);
+        topTenPages = new ArrayDeque<>(10_000);
         listOfPagesToCrawl.add(seedURL);
         keywordList = termsToSearch;
     }
@@ -35,7 +35,7 @@ public class WebCrawler {
     public void crawl() {
         int crawledPages = 0;
         List<String> buffer = new ArrayList<>(100);
-        while (!listOfPagesToCrawl.isEmpty() && listOfVisitedPages.size() <= MAX_VISITED_PAGES) {
+        while (!listOfPagesToCrawl.isEmpty() && listOfVisitedPages.size() < MAX_VISITED_PAGES) {
             CrawlURL currentLink = listOfPagesToCrawl.remove();
             var url = currentLink.getUrl();
             var depth = currentLink.getDepth();
@@ -43,13 +43,13 @@ public class WebCrawler {
 
             var doc = getPage(depth, url, listOfVisitedPages);
             hitsHunter.search(doc);
-            topTenPages.putAll(hitsHunter.getHitsList());
+            topTenPages.add(hitsHunter);
 
             Printer.printProcess(url, depth, listOfVisitedPages);
             var result = Printer.printTotalResult(hitsHunter);
             buffer.add(result);
             if (buffer.size() == 100) {
-                CSVWriter.writeIn(buffer);
+                CSVWriter.writeInAllStat(buffer);
                 buffer = new ArrayList<>(100);
             }
 
@@ -64,15 +64,22 @@ public class WebCrawler {
                 }
             }
         }
+
         var sorted = topTenPages
-                .entrySet()
                 .stream()
-                .sorted(Map.Entry.comparingByValue(Comparator.reverseOrder()))
-                .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue,
-                        (e1, e2) -> e1, LinkedHashMap::new));
+                .sorted()
+                .limit(10)
+                .collect(Collectors.toList());
+
+        List<String> resArr = new ArrayList<>(10);
+        for (HitsHunter hunter : sorted) {
+            var res = Printer.printTotalResult(hunter);
+            resArr.add(res);
+        }
+        CSVWriter.writeInTopTen(resArr);
+
         System.out.println("Finished!");
     }
-
 
     private Document getPage(int depth, String url, Deque<String> listOfPages) {
 
