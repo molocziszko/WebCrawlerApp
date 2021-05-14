@@ -37,9 +37,9 @@ public class WebCrawler {
         List<String> buffer = new ArrayList<>(100);
         while (!listOfPagesToCrawl.isEmpty() && listOfVisitedPages.size() < MAX_VISITED_PAGES) {
             CrawlURL currentLink = listOfPagesToCrawl.remove();
-            var url = currentLink.getUrl();
-            var depth = currentLink.getDepth();
-            HitsHunter hitsHunter = new HitsHunter(currentLink.getUrl(), keywordList);
+            var url = currentLink.url();
+            var depth = currentLink.depth();
+            HitsHunter hitsHunter = new HitsHunter(url, keywordList);
 
             var doc = getPage(depth, url, listOfVisitedPages);
             hitsHunter.search(doc);
