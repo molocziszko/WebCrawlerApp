@@ -1,12 +1,9 @@
 package com.molocziszko.webcrawler;
 
+import com.molocziszko.webcrawler.model.CrawlURL;
+import com.molocziszko.webcrawler.service.WebCrawler;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-
-import java.util.ArrayDeque;
-import java.util.Deque;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class WebCrawlerTest {
     final int MAX_DEPTH = 8;

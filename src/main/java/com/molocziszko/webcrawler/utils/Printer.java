@@ -1,6 +1,6 @@
 package com.molocziszko.webcrawler.utils;
 
-import com.molocziszko.webcrawler.HitsHunter;
+import com.molocziszko.webcrawler.service.HitsHunter;
 
 import java.util.Collection;
 

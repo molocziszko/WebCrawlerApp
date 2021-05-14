@@ -1,4 +1,4 @@
-package com.molocziszko.webcrawler;
+package com.molocziszko.webcrawler.service;
 
 import com.molocziszko.webcrawler.utils.Extractor;
 import org.jsoup.nodes.Document;

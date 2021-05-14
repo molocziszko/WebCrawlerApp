@@ -1,5 +1,8 @@
 package com.molocziszko.webcrawler;
 
+import com.molocziszko.webcrawler.model.CrawlURL;
+import com.molocziszko.webcrawler.service.WebCrawler;
+
 public class App {
 
     /**

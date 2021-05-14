@@ -1,14 +1,15 @@
-package com.molocziszko.webcrawler;
+package com.molocziszko.webcrawler.service;
 
+import com.molocziszko.webcrawler.model.CrawlURL;
 import com.molocziszko.webcrawler.utils.CSVWriter;
 import com.molocziszko.webcrawler.utils.Printer;
+import com.molocziszko.webcrawler.utils.TopTenReporter;
 import org.jsoup.Connection;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * This class find and count the number of matches of predefined terms.
@@ -64,9 +65,8 @@ public class WebCrawler {
                 }
             }
         }
-        List<HitsHunter> sorted = getSortedTopTen();
-
-        writeTopTen(sorted);
+        List<HitsHunter> sorted = TopTenReporter.getSortedTopTen(topTenPages);
+        TopTenReporter.writeReport(sorted);
 
         System.out.println("Finished!");
     }
@@ -99,23 +99,5 @@ public class WebCrawler {
 
     public Deque<HitsHunter> getTopTenPages() {
         return topTenPages;
-    }
-
-    private void writeTopTen(List<HitsHunter> sorted) {
-        List<String> resArr = new ArrayList<>(10);
-        for (HitsHunter hunter : sorted) {
-            var res = Printer.printTotalResult(hunter);
-            resArr.add(res);
-        }
-        CSVWriter.writeInTopTen(resArr);
-    }
-
-    private List<HitsHunter> getSortedTopTen() {
-        var sorted = topTenPages
-                .stream()
-                .sorted()
-                .limit(10)
-                .collect(Collectors.toList());
-        return sorted;
     }
 }

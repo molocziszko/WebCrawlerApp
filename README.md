@@ -13,9 +13,9 @@ by total hits will be written in another CSV file.
 1. Download project from github.com/molocziszko/WebCrawlerApp and save it in your local directory.
 2. After downloading navigate to WebCrawlerApp directory (use cd /WebCrawlerApp).
 3. Open console and input:
-   - `gradlew run` on Linux (Mac) 
+- `./gradlew run` on Linux (Mac) 
    
 or
-  -  `.\gradlew run` on Windows (Powershell).
+-  `.\gradlew run` on Windows (Powershell).
    
    
