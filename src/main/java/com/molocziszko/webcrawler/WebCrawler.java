@@ -10,6 +10,11 @@ import org.jsoup.nodes.Element;
 import java.util.*;
 import java.util.stream.Collectors;
 
+/**
+ * This class find and count the number of matches of predefined terms.
+ * It aims to crawl, find matches and pass produced data to @codeCSVWriter
+ * to put that in file.
+ */
 public class WebCrawler {
     private static final int MAX_DEPTH = 8;
     private static final int MAX_VISITED_PAGES = 10_000;
@@ -25,11 +30,6 @@ public class WebCrawler {
         topTenPages = new ArrayDeque<>(10_000);
         listOfPagesToCrawl.add(seedURL);
         keywordList = termsToSearch;
-    }
-
-    public static void main(String[] args) {
-        String terms = "Tesla, Musk, Gigafactory, Elon Mask";
-        new WebCrawler(new CrawlURL("https://en.wikipedia.org/wiki/Elon_Musk", 0), terms).crawl();
     }
 
     public void crawl() {
@@ -64,19 +64,9 @@ public class WebCrawler {
                 }
             }
         }
+        List<HitsHunter> sorted = getSortedTopTen();
 
-        var sorted = topTenPages
-                .stream()
-                .sorted()
-                .limit(10)
-                .collect(Collectors.toList());
-
-        List<String> resArr = new ArrayList<>(10);
-        for (HitsHunter hunter : sorted) {
-            var res = Printer.printTotalResult(hunter);
-            resArr.add(res);
-        }
-        CSVWriter.writeInTopTen(resArr);
+        writeTopTen(sorted);
 
         System.out.println("Finished!");
     }
@@ -97,5 +87,35 @@ public class WebCrawler {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public Deque<CrawlURL> getListOfPagesToCrawl() {
+        return listOfPagesToCrawl;
+    }
+
+    public Deque<String> getListOfVisitedPages() {
+        return listOfVisitedPages;
+    }
+
+    public Deque<HitsHunter> getTopTenPages() {
+        return topTenPages;
+    }
+
+    private void writeTopTen(List<HitsHunter> sorted) {
+        List<String> resArr = new ArrayList<>(10);
+        for (HitsHunter hunter : sorted) {
+            var res = Printer.printTotalResult(hunter);
+            resArr.add(res);
+        }
+        CSVWriter.writeInTopTen(resArr);
+    }
+
+    private List<HitsHunter> getSortedTopTen() {
+        var sorted = topTenPages
+                .stream()
+                .sorted()
+                .limit(10)
+                .collect(Collectors.toList());
+        return sorted;
     }
 }
