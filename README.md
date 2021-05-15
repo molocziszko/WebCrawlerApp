@@ -7,8 +7,6 @@ The main goal is to accumulate statistic according to given terms (key words). C
 count matches and write result into CSV file. Finally, after whole cycle ends the statistic about top 10 pages sorted 
 by total hits will be written in another CSV file.
 
-## Requirements
-- languageVersion =
 
 ## Quickstart
 1. Download project and save it in your local directory.
