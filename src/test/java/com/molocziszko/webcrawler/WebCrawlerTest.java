@@ -16,14 +16,7 @@ class WebCrawlerTest {
     @Test
     void crawl() {
 
-
-       /* final Deque<CrawlURL> listOfPagesToCrawl = new ArrayDeque<>();
-        final Deque<String> listOfVisitedPages = new ArrayDeque<>();
-        final Deque<HitsHunter> topTenPages = new ArrayDeque<>();
-        WebCrawler webCrawler = null;
-        new WebCrawler(new CrawlURL(url, 0), terms).crawl();*/
-
-
         Assertions.assertEquals(5, webCrawler.getListOfVisitedPages().size());
+        Assertions.assertEquals(5, );
     }
 }

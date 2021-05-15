@@ -8,9 +8,10 @@ count matches and write result into CSV file. Finally, after whole cycle ends th
 by total hits will be written in another CSV file.
 
 ## Requirements
+- languageVersion =
 
 ## Quickstart
-1. Download project from github.com/molocziszko/WebCrawlerApp and save it in your local directory.
+1. Download project and save it in your local directory.
 2. After downloading navigate to WebCrawlerApp directory (use cd /WebCrawlerApp).
 3. Open console and input:
 - `./gradlew run` on Linux (Mac) 

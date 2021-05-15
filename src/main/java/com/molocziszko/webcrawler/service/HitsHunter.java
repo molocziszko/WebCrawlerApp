@@ -7,6 +7,12 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+/**
+ * @author molocziszko
+ * @version 1.0
+ *
+ * This class find and count the number of matches of predefined terms on each page.
+ */
 public class HitsHunter implements Comparable<HitsHunter> {
     private static String keywordList;
     private final Map<String, Integer> hitsList;
@@ -27,6 +33,11 @@ public class HitsHunter implements Comparable<HitsHunter> {
         }
     }
 
+    /**
+     * Method for searching and counting matches of predefined terms.
+     *
+     * @param doc raw HTML page
+     */
     public void search(Document doc) {
         var matcherTextList = Extractor.extract(doc);
         var keys = Extractor.toArr(getKeywordList());

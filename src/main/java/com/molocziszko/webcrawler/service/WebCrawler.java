@@ -12,13 +12,15 @@ import org.jsoup.nodes.Element;
 import java.util.*;
 
 /**
+ * @author molocziszko
+ * @version 1.0
+ * <p>
  * This class find and count the number of matches of predefined terms.
- * It aims to crawl, find matches and pass produced data to @codeCSVWriter
- * to put that in file.
+ * It aims to crawl, fetch HTML representation and pass produced data further to
  */
 public class WebCrawler {
     private static final int MAX_DEPTH = 8;
-    private static final int MAX_VISITED_PAGES = 10_000;
+    private static final int MAX_VISITED_PAGES = 10_0;
 
     private final Deque<CrawlURL> listOfPagesToCrawl;
     private final Deque<String> listOfVisitedPages;
@@ -33,6 +35,11 @@ public class WebCrawler {
         keywordList = termsToSearch;
     }
 
+    /**
+     * Main entry point into the logic for crawling pages.
+     * It crawls the links, collect data in buffer, which then passed
+     * to write statistic in a file.
+     */
     public void crawl() {
         int crawledPages = 0;
         List<String> buffer = new ArrayList<>(100);
@@ -50,7 +57,7 @@ public class WebCrawler {
             var result = Printer.printTotalResult(hitsHunter);
             buffer.add(result);
             if (buffer.size() == 100) {
-                CSVWriter.writeInAllStat(buffer);
+                CSVWriter.writeInFile(buffer, false);
                 buffer = new ArrayList<>(100);
             }
 
@@ -71,6 +78,14 @@ public class WebCrawler {
         System.out.println("Finished!");
     }
 
+    /**
+     * Helper method that performs getting a page over HTTP using JSOUP library.
+     *
+     * @param depth The current depth of the crawl processing
+     * @param url   The URL that we're crawling at this point
+     * @return A {@code Document} that we pass to search method
+     * @see HitsHunter#search(Document doc)
+     */
     private Document getPage(int depth, String url, Deque<String> listOfPages) {
 
         try {
