@@ -20,7 +20,7 @@ import java.util.*;
  */
 public class WebCrawler {
     private static final int MAX_DEPTH = 8;
-    private static final int MAX_VISITED_PAGES = 10_0;
+    private static final int MAX_VISITED_PAGES = 10_000;
 
     private final Deque<CrawlURL> listOfPagesToCrawl;
     private final Deque<String> listOfVisitedPages;
